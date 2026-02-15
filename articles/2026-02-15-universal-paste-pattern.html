@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Universal Paste Pattern: Publishing One Article Across Three Platforms with Browser Automation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Charter', 'Georgia', serif;
+            line-height: 1.7;
+            color: #1a1a1a;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        h1 {
+            font-size: 2em;
+            line-height: 1.2;
+            margin-bottom: 0.5em;
+            font-weight: 700;
+        }
+        .subtitle {
+            font-size: 1.1em;
+            color: #555;
+            font-style: italic;
+            margin-bottom: 2em;
+            line-height: 1.5;
+        }
+        h2 {
+            font-size: 1.4em;
+            margin-top: 2em;
+            margin-bottom: 0.8em;
+            font-weight: 700;
+        }
+        p { margin-bottom: 1.2em; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        blockquote {
+            border-left: 3px solid #ddd;
+            padding-left: 1.2em;
+            margin: 1.5em 0;
+            color: #444;
+            font-style: italic;
+        }
+        strong { font-weight: 700; }
+        em { font-style: italic; }
+        ul, ol {
+            margin: 1em 0;
+            padding-left: 1.5em;
+        }
+        li { margin-bottom: 0.5em; }
+        pre {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1em;
+            overflow-x: auto;
+            margin: 1.5em 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        code {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+        p code, li code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #e0e0e0;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 2.5em 0;
+        }
+        .footer {
+            margin-top: 3em;
+            padding-top: 1.5em;
+            border-top: 1px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+        }
+        .comment { color: #6a9955; }
+    </style>
+</head>
+<body>
+    <h1>The Universal Paste Pattern: Publishing One Article Across Three Platforms with Browser Automation</h1>
+    <p class="subtitle">How we discovered that Substack, LinkedIn, and Twitter all speak ClipboardEvent &mdash; and what broke along the way</p>
+    <hr>
+
+    <p>We just published 15,000 characters to three platforms in under 10 minutes &mdash; with browser automation, not APIs.</p>
+
+    <p>No OAuth tokens. No platform SDKs. No markdown-to-platform conversion libraries. Just Chrome, a ClipboardEvent, and a few hard-won bug fixes.</p>
+
+    <p>This happened while publishing the <a href="https://chatwithgpt.substack.com/p/from-tweet-to-treatise">Grit-CART article</a> &mdash; a 5,000-word piece about turning a Grok conversation into a research framework. The article was the deliverable. But the <em>process</em> of getting it onto three platforms surfaced something more broadly useful: a universal publishing pattern, a catalog of platform-specific bugs, and three reusable skills that will make every future article a 3-minute operation instead of a 30-minute one.</p>
+
+    <p>This is the <a href="https://chatwithgpt.substack.com/p/compound-engineering-use-it-before">compound engineering</a> cycle in miniature: do it live, hit bugs, document them, codify the fixes. Each loop through the cycle reduces friction for the next pass. The Grit-CART article was the first pass. This article is the documentation. The three skills are the codified output.</p>
+
+    <h2>The Universal Discovery</h2>
+
+    <p>Here&rsquo;s the surprise: Substack, LinkedIn, and Twitter all accept rich text the same way.</p>
+
+    <p>All three platforms use JavaScript-based rich text editors &mdash; Substack and LinkedIn use <a href="https://prosemirror.net/">ProseMirror</a>, Twitter uses <a href="https://draftjs.org/">DraftJS</a>. Despite the different frameworks, they all handle paste events identically. You construct a <code>ClipboardEvent</code> with <code>text/html</code> data, dispatch it on the editor element, and the platform processes it as if the user pasted from their clipboard.</p>
+
+    <p>The universal paste pattern is six lines of JavaScript:</p>
+
+    <pre><code><span class="comment">// The Universal Paste Pattern &mdash; works on ProseMirror and DraftJS</span>
+const clipboardData = new DataTransfer();
+clipboardData.setData('text/html', htmlChunk);
+clipboardData.setData('text/plain', '');
+const pasteEvent = new ClipboardEvent('paste', {
+  clipboardData, bubbles: true, cancelable: true
+});
+editor.dispatchEvent(pasteEvent);</code></pre>
+
+    <p>That&rsquo;s it. This works on ProseMirror. It works on DraftJS. It would likely work on any contenteditable-based editor that listens for paste events, because the <code>ClipboardEvent</code> API is a web standard, not a framework feature.</p>
+
+    <p>The <code>text/html</code> MIME type is the key. When you set it, the editor receives structured HTML &mdash; headings, bold, italic, links, lists, blockquotes &mdash; and maps them to its internal document model. Set <code>text/plain</code> to empty so the editor doesn&rsquo;t fall back to plain text.</p>
+
+    <p>Why does this matter? Because it means you don&rsquo;t need three different publishing integrations. You need one HTML article and one paste function. The platform differences are in the <em>preprocessing</em> and <em>postprocessing</em>, not in the core delivery mechanism.</p>
+
+    <h2>The Cross-Platform Comparison</h2>
+
+    <p>We published to all three platforms during a single session. Here&rsquo;s what we found:</p>
+
+    <ul>
+        <li><strong>Editor framework:</strong> Substack and LinkedIn use ProseMirror; Twitter uses DraftJS</li>
+        <li><strong>Body selector:</strong> <code>.ProseMirror[contenteditable]</code> for Substack/LinkedIn; <code>.public-DraftEditor-content</code> for Twitter</li>
+        <li><strong>Heading level:</strong> Substack and Twitter accept H2 natively; LinkedIn auto-converts H2 to H3</li>
+        <li><strong>Title method:</strong> Substack requires <code>execCommand</code> (click+type is unreliable); LinkedIn and Twitter accept click+type</li>
+        <li><strong>Title limit:</strong> Twitter enforces a hard 100-character limit; Substack and LinkedIn have none</li>
+        <li><strong>Subtitle field:</strong> Only Substack has one</li>
+        <li><strong>X embed auto-render:</strong> Only Substack auto-renders raw X/Twitter URLs as rich embed cards</li>
+        <li><strong>Heading merge bug:</strong> Present on Substack and LinkedIn (ProseMirror); absent on Twitter (DraftJS)</li>
+        <li><strong>Table paste:</strong> Stripped on all three &mdash; always convert <code>&lt;table&gt;</code> to <code>&lt;ul&gt;</code> before pasting</li>
+        <li><strong>Recommended length:</strong> Substack and LinkedIn accept full-length articles; Twitter articles should be ~900&ndash;1000 words</li>
+    </ul>
+
+    <p>The good news: paragraphs, bold, italic, links, lists, and blockquotes work everywhere. You can write one HTML article and paste it to all three. The bad news: <code>&lt;table&gt;</code> HTML is stripped on every platform. ProseMirror flattens tables into a single paragraph; DraftJS drops them similarly. The workaround is to pre-convert tables to bullet lists with bold labels:</p>
+
+    <pre><code><span class="comment">&lt;!-- Before: stripped on all platforms --&gt;</span>
+&lt;table&gt;
+  &lt;tr&gt;&lt;td&gt;Editor&lt;/td&gt;&lt;td&gt;ProseMirror&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+<span class="comment">&lt;!-- After: works everywhere --&gt;</span>
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Editor:&lt;/strong&gt; ProseMirror&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+
+    <p>Platform-specific preprocessing adds a few more steps. For LinkedIn, convert all <code>&lt;h2&gt;</code> tags to <code>&lt;h3&gt;</code> (LinkedIn will do it anyway, but pre-converting avoids inconsistencies). For Twitter, condense the article to ~1000 words and truncate the title to 100 characters. For Substack, leave raw X/Twitter URLs on their own paragraph line &mdash; they&rsquo;ll auto-render as embedded posts.</p>
+
+    <h2>The Heading Merge Bug</h2>
+
+    <p>This was the most dramatic bug of the session. After pasting the Grit-CART article into Substack in four chunks, I scrolled through to verify the formatting. The section headings looked wrong. One paragraph ended with:</p>
+
+    <blockquote>&ldquo;...end of paragraph text.The Spark: Human Direction on X&rdquo;</blockquote>
+
+    <p>A period, immediately followed by a capital letter, with the entire section heading absorbed into the preceding paragraph. No line break. No heading formatting. Just a run-on sentence where a bold H2 should have been.</p>
+
+    <p>The cause is a ProseMirror behavior: when you paste HTML that starts with a block element like <code>&lt;h2&gt;</code>, ProseMirror merges it into the current block at the cursor position. If the cursor is at the end of a <code>&lt;p&gt;</code>, the heading&rsquo;s text gets appended to that paragraph instead of creating a new block.</p>
+
+    <p>This happens at every chunk boundary. If you split a long article into four paste operations, you get up to three merged headings.</p>
+
+    <p>The fix is a post-processing scan that finds these merged headings and surgically splits them back out:</p>
+
+    <pre><code><span class="comment">// Heading Merge Fix &mdash; post-process ProseMirror paste artifacts</span>
+const editor = document.querySelector('.ProseMirror[contenteditable="true"]');
+const paragraphs = editor.querySelectorAll('p');
+let fixes = 0;
+const mergePattern = /([.!?])([A-Z][^.]+:)/;
+
+paragraphs.forEach(p =&gt; {
+  const match = p.innerText.match(mergePattern);
+  if (match) {
+    const splitIndex = p.innerHTML.indexOf(match[2]);
+    if (splitIndex &gt; -1) {
+      const headingText = match[2] + p.innerHTML.slice(splitIndex + match[2].length);
+      p.innerHTML = p.innerHTML.slice(0, splitIndex);
+      const h2 = document.createElement('h2');
+      h2.innerHTML = headingText;
+      p.parentNode.insertBefore(h2, p.nextSibling);
+      fixes++;
+    }
+  }
+});</code></pre>
+
+    <p>The regex <code>/([.!?])([A-Z][^.]+:)/</code> catches the telltale pattern: sentence-ending punctuation immediately followed by a capitalized phrase ending in a colon (which matches the heading style of the Grit-CART article). For each match, it slices the paragraph at the split point, creates a new <code>&lt;h2&gt;</code> element with the heading text, and inserts it after the paragraph using <code>insertBefore</code>.</p>
+
+    <p>The plot twist: this same bug appears on LinkedIn (which also uses ProseMirror), but <em>not</em> on Twitter. DraftJS handles block elements at chunk boundaries cleanly &mdash; no post-processing needed. One editor framework&rsquo;s bug is another&rsquo;s non-issue. (One detail: since LinkedIn uses H3 for section headings, the LinkedIn version of this fix creates an <code>&lt;h3&gt;</code> instead of <code>&lt;h2&gt;</code> &mdash; same logic, different element.)</p>
+
+    <h2>The Click That Doesn&rsquo;t Click</h2>
+
+    <p>Setting the article title on Substack should be simple: click the title field, type the text. But browser automation coordinates aren&rsquo;t pixel-perfect. The title, subtitle, and body editor are stacked vertically with thin boundaries between them. A click that&rsquo;s a few pixels off lands in the wrong field, and your title text ends up as the first paragraph of the body.</p>
+
+    <p>The fix: skip click+type entirely. Use <code>document.execCommand</code> to programmatically select and replace the field content:</p>
+
+    <pre><code><span class="comment">// execCommand Fallback &mdash; reliable title input for Substack</span>
+const titleEl = document.querySelector(
+  '[data-testid="post-title"] div[contenteditable]'
+) || document.querySelector('h2[contenteditable]');
+titleEl.focus();
+document.execCommand('selectAll', false, null);
+document.execCommand('insertText', false, 'Your Title Here');</code></pre>
+
+    <p><code>execCommand</code> is technically deprecated, but it still works in every major browser and is the most reliable way to set text in contenteditable fields. It triggers all the same input events that manual typing would, so the editor&rsquo;s internal state stays consistent.</p>
+
+    <p>The interesting part: this is only necessary on Substack. LinkedIn and Twitter both accept click+type for their title fields without issues. Each platform has its own automation personality &mdash; what works on one may fail silently on another. The lesson: browser automation needs fallback strategies, not universal assumptions.</p>
+
+    <h2>From Friction to Skills</h2>
+
+    <p>During the Grit-CART publishing session, we built three skills: <code>publish-to-substack</code>, <code>publish-to-linkedin</code>, and <code>publish-to-twitter</code>. Each one encodes the platform-specific bugs and fixes discovered during live publishing:</p>
+
+    <ul>
+        <li><strong>publish-to-substack:</strong> Uses <code>execCommand</code> for title/subtitle, pastes body in ~4 chunks via ClipboardEvent, runs the heading merge fix, handles section dropdown selection, and flags cover image for manual upload.</li>
+        <li><strong>publish-to-linkedin:</strong> Pre-converts H2 to H3, converts raw X/Twitter URLs to <code>&lt;a href&gt;</code> links (no auto-embed), runs the same heading merge fix, and navigates through the &ldquo;Create new edition&rdquo; flow.</li>
+        <li><strong>publish-to-twitter:</strong> Condenses articles to ~1000 words, enforces the 100-character title limit, skips the heading merge fix (DraftJS doesn&rsquo;t need it), and builds an optional companion thread.</li>
+    </ul>
+
+    <p>Each skill is a <a href="https://chatwithgpt.substack.com/p/building-shareable-learning-design">Claude Code skill</a> &mdash; a markdown file that encodes step-by-step browser automation instructions with exact CSS selectors, JavaScript snippets, and known-bug workarounds. They&rsquo;re reusable: the next article goes to all three platforms in minutes instead of half an hour.</p>
+
+    <p>This is the broader pattern that keeps showing up in AI-assisted work:</p>
+
+    <ol>
+        <li><strong>Do it live</strong> &mdash; publish manually with automation, hitting every edge case</li>
+        <li><strong>Document</strong> &mdash; capture what broke and what worked in a process log</li>
+        <li><strong>Codify</strong> &mdash; extract the patterns into reusable skills</li>
+        <li><strong>Compound</strong> &mdash; the next iteration starts where the last one left off</li>
+    </ol>
+
+    <p>The Grit-CART article was the content. The publishing process was the real product. Three platforms, one paste pattern, a handful of bugs, and three skills that make the next article almost effortless.</p>
+
+    <p>That&rsquo;s compound engineering at work: you don&rsquo;t just ship the thing &mdash; you ship the process that makes shipping the next thing faster.</p>
+
+    <div class="footer">
+        <p>This article was published using the skills it describes. The cover images, markdown, and HTML were generated by Claude. The publishing was automated via Chrome browser automation. The meta-level cycle continues.</p>
+        <p>Part of <a href="https://chatwithgpt.substack.com/">The Hybrid Builder</a> &mdash; a newsletter about building with AI as a creative partner.</p>
+    </div>
+</body>
+</html>

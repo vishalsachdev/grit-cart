@@ -8,9 +8,11 @@ Read the full article on Substack: **[From Tweet to Treatise](https://chatwithgp
 
 ---
 
-## What Is This?
+## The Grit-CART Framework
 
-This repository contains the complete research corpus behind the Grit-CART framework — a dispositional toolkit for AI-era entrepreneurship and intrapreneurship education, built from Vinod Khosla's four traits (curiosity, agency, risk-taking, taste) and Angela Duckworth's grit research.
+**Grit-CART** is a dispositional toolkit for AI-era entrepreneurship and intrapreneurship education. It maps four traits identified by Vinod Khosla — **Curiosity**, **Agency**, **Risk-Taking**, and **Taste** (CART) — against established behavioral science research, with Angela Duckworth's **Grit** as the overarching engine.
+
+The framework argues that in an AI-disrupted job market, these dispositional traits matter more than technical skills. Each trait is grounded in peer-reviewed research: Kashdan's curiosity dimensions, self-determination theory for agency, Stanovich's rational thinking for risk-taking, and Csikszentmihalyi's flow states for taste. The framework applies to both entrepreneurship *and* intrapreneurship, with case studies for each context.
 
 It started with [a tweet](https://x.com/vkhosla/status/2022887136803029331), became [a Grok conversation](https://x.com/i/grok/share/5c6e617391a14f59a8551d749ab7060c), and was then rigorously evaluated by five parallel AI agents — each with a different critical lens — in a single afternoon session.
 
@@ -34,8 +36,9 @@ Each agent ran independently with web research access, conducting ~50 searches t
 - **[Critical Evaluation Synthesis](evaluations/critical-evaluation-synthesis.md)** — Cross-agent findings and unanimous conclusions
 - **[Growth Mindset Research Notes](growth-mindset-grit-research-notes.md)** — Deep dive into Dweck-Duckworth collaboration, triggered by a human-in-the-loop observation
 
-### Article
-- **[From Tweet to Treatise](articles/2026-02-15-from-tweet-to-treatise.md)** — The Hybrid Builder newsletter article describing the entire process
+### Articles
+- **[From Tweet to Treatise](articles/2026-02-15-from-tweet-to-treatise.md)** — The Hybrid Builder newsletter article describing the entire research process
+- **[The Universal Paste Pattern](articles/2026-02-15-universal-paste-pattern.md)** — Meta-article on cross-platform publishing automation discovered during this project
 
 ## The Process
 
