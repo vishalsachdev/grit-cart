@@ -159,7 +159,7 @@ The Grit-CART framework still needs classroom testing. It still needs diverse ca
 
 ---
 
-*The full research corpus — Grok transcript, five individual evaluations, synthesis, and growth mindset research notes — is available in the [project repository](https://github.com/). All 74 cited sources link to their primary publications.*
+*The full research corpus — Grok transcript, five individual evaluations, synthesis, and growth mindset research notes — is available in the [project repository](https://github.com/vishalsachdev/grit-cart). All 74 cited sources link to their primary publications.*
 
 ## Session Transcript
 This article was written during a live collaboration session.
