@@ -10,11 +10,44 @@ Read the full article on Substack: **[From Tweet to Treatise](https://chatwithgp
 
 ## The Grit-CART Framework
 
-**Grit-CART** is a dispositional toolkit for AI-era entrepreneurship and intrapreneurship education. It maps four traits identified by Vinod Khosla — **Curiosity**, **Agency**, **Risk-Taking**, and **Taste** (CART) — against established behavioral science research, with Angela Duckworth's **Grit** as the overarching engine.
-
-The framework argues that in an AI-disrupted job market, these dispositional traits matter more than technical skills. Each trait is grounded in peer-reviewed research: Kashdan's curiosity dimensions, self-determination theory for agency, Stanovich's rational thinking for risk-taking, and Csikszentmihalyi's flow states for taste. The framework applies to both entrepreneurship *and* intrapreneurship, with case studies for each context.
+**Grit-CART** is a dispositional toolkit for AI-era entrepreneurship and intrapreneurship education. In a world where AI commoditizes intelligence, the scarce resources are human ones — sustained curiosity, the will to act, the courage to experiment, and the wisdom to judge well.
 
 It started with [a tweet](https://x.com/vkhosla/status/2022887136803029331), became [a Grok conversation](https://x.com/i/grok/share/5c6e617391a14f59a8551d749ab7060c), and was then rigorously evaluated by five parallel AI agents — each with a different critical lens — in a single afternoon session.
+
+### The CART Traits
+
+Four traits form an iterative cycle, with **Grit** (sustained engagement + adaptive persistence) as the engine that drives repeated passes through the loop:
+
+| Trait | What It Means | Research Basis | Key Question |
+|-------|---------------|----------------|--------------|
+| **C**uriosity | Actively exploring problems and adjacent domains | Kashdan's curiosity dimensions, Big Five openness | *What don't I know? What could exist?* |
+| **A**gency | Taking action and marshaling resources under uncertainty | Self-determination theory (autonomy), effectuation | *What can I do about it right now?* |
+| **R**esourceful Experimentation | Running structured experiments with bounded downside | Lean Startup, Sarasvathy's affordable loss principle | *What small bet can I test cheaply?* |
+| **T**houghtful Judgment | Evaluating results honestly, including ethical implications | Stanovich's rational thinking, critical thinking literature | *What did I learn? Should I persist, pivot, or stop?* |
+
+**Growth mindset** (Dweck) serves as the cognitive precondition — persistence only makes sense if you believe effort leads to improvement.
+
+### What Makes It Different
+
+| Existing Framework | Focus | Grit-CART Adds... |
+|--------------------|-------|-------------------|
+| Lean Startup | Build-Measure-Learn cycle for ventures | Psychological readiness *before* the cycle begins |
+| Effectuation (Sarasvathy) | Means-based reasoning under uncertainty | Explicit trait development + well-being |
+| Design Thinking | Empathy-driven problem solving | Agency, risk tolerance, and long-term persistence |
+| Entrepreneurial Mindset (NFTE/ICE) | Opportunity recognition | Theoretical depth via behavioral science |
+
+### Four-Layer Ecosystem
+
+The [strengthened framework (CART 2.0)](evaluations/05-strengthened-framework.md) extends individual traits into a four-layer model:
+
+```
+Context          Market conditions, AI infrastructure, regulatory environment
+  └─ Relationships   Teams, mentors, networks, peer accountability
+       └─ Capabilities   AI literacy, business fundamentals, ethical reasoning
+            └─ CART + Grit   Individual dispositions (the core cycle)
+```
+
+The dual-track design applies the same CART cycle to both **entrepreneurship** (founding new ventures) and **intrapreneurship** (innovating within existing organizations) — acknowledging that most students will enter existing organizations, not start companies.
 
 ## Repository Contents
 
