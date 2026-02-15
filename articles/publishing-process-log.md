@@ -124,7 +124,9 @@ Documenting every step of publishing an article to Substack via Chrome automatio
   editor.dispatchEvent(pasteEvent);
   ```
 - **Chunk size**: Paste in ~4 chunks to avoid issues with very large HTML
-- **What works**: `<h2>`, `<p>`, `<strong>`, `<em>`, `<a href>`, `<blockquote>`, `<table>`, `<hr>`
+- **What works**: `<h2>`, `<p>`, `<strong>`, `<em>`, `<a href>`, `<blockquote>`, `<ul>/<li>`, `<hr>`
+- **DOES NOT WORK**: `<table>` — ProseMirror strips table HTML during paste, flattening it into a single paragraph. Use `<ul>` with bold labels instead.
+- **HEADING MERGE BUG**: When pasting in chunks, `<h2>` at the start of a chunk often merges into the last `<p>` of the previous chunk. Fix: after all chunks are pasted, scan for merged headings (e.g., `text.The Spark:`) and split them using `insertBefore(h2, nextSibling)` on the parent.
 - **X post embeds**: Raw X/Twitter URLs (e.g., `https://x.com/user/status/123`) placed on their own line auto-render as rich embed cards in Substack!
 - **Links**: All `<a href="...">` tags preserve their URLs correctly
 - **Tables**: HTML `<table>` renders as Substack native tables
@@ -165,7 +167,8 @@ Documenting every step of publishing an article to Substack via Chrome automatio
 ### What Doesn't Work
 1. **Click+type for title/subtitle** — coordinates are unreliable, text ends up in wrong field
 2. **Direct file upload** — browser automation can't access local filesystem for file inputs
-3. **Single large paste** — untested but chunking is safer
+3. **HTML `<table>` paste** — ProseMirror strips tables, flattening to single paragraph. Use `<ul>` with `<strong>` labels instead.
+4. **H2 at chunk boundaries** — headings at the start of a paste chunk merge into the last paragraph of the previous chunk. Must post-process to split them.
 
 ### Recommended Skill Architecture
 ```
